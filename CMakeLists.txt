@@ -31,25 +31,39 @@ endif(${CMAKE_SOURCE_DIR}/src STREQUAL ${CMAKE_BINARY_DIR})
 # Set basic project settings
 #------------------------------------------------------------------------
 project (tsproc)
-enable_language (Fortran CXX)
+enable_language (Fortran CXX )
 
 SET(CPACK_GENERATOR "TGZ")
 include(CPack)
 
 set(PACKAGE_BUGREPORT "smwesten@usgs.gov")
 set(PACKAGE_NAME "tsproc")
-set(PACKAGE_STRING "tsproc 1.0.3")
+set(PACKAGE_STRING "tsproc 1.0.4")
 set(PACKAGE_TARNAME "tsproc")
-set(PACKAGE_VERSION "1.0.3")
+set(PACKAGE_VERSION "1.0.4")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+SET( CMAKE_CXX_FLAGS  "${CMAKE_Fortran_FLAGS_RELEASE}")
+set( CMAKE_EXE_LINKER_FLAGS="-static" )
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.6)
 
 include( cmake/options_and_targets.cmake )
-include( cmake/find_programs_and_libraries.cmake )
+
+set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIB_GCC})
+set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIB_GFORTRAN})
+link_libraries(${EXTERNAL_LIBS})
+
+if (  CMAKE_HOST_WIN32 )
+  set ( TSPROC_EXECUTABLE "tsproc.exe" )
+else ()
+  set ( TSPROC_EXECUTABLE "tsproc" )
+endif()
 
 add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/${TSPROC_EXECUTABLE} ${CMAKE_INSTALL_PREFIX}/${TSPROC_EXECUTABLE} )
+
+# include Git commit hash
+include( cmake/version_control.cmake )
 
 # print a summary of important details to screen
 include( cmake/print_summary.cmake )
